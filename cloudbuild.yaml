@@ -29,6 +29,9 @@ images:
 # Set a timeout (optional)
 timeout: '1200s'
 
-# Configure logging
+# Configure logging and service account
 options:
   logging: CLOUD_LOGGING_ONLY
+
+# Specify the service account to use
+serviceAccount: 'projects/apytracker-backend/serviceAccounts/svc-apytracker@apytracker-backend.iam.gserviceaccount.com'
