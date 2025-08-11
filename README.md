@@ -171,6 +171,47 @@ POST /calculator
    
    After setup, whenever you push changes to your GitHub repository, Cloud Build will automatically detect the change and deploy the updated application to Cloud Run.
 
+### Understanding the cloudbuild.yaml File
+
+```yaml
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/apytracker-backend', '.']
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/apytracker-backend']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - 'apytracker-backend'
+    - '--image=gcr.io/$PROJECT_ID/apytracker-backend'
+    - '--region=us-central1'
+    - '--platform=managed'
+    - '--allow-unauthenticated'
+    - '--memory=512Mi'
+    - '--min-instances=0'
+    - '--max-instances=10'
+```
+
+**Important Notes:**
+
+1. **$PROJECT_ID variable**: Cloud Build automatically replaces `$PROJECT_ID` with your actual Google Cloud project ID. You don't need to manually set this value.
+
+2. **Customizing the file**:
+   - Change `us-central1` to your preferred region if needed
+   - Adjust memory and instance settings based on your needs
+   - Add additional build steps if required
+
+3. **Troubleshooting**:
+   - If your build fails, check the Cloud Build logs for detailed error messages
+   - Most common issues are related to permissions or incorrectly formatted YAML
+
 ### Managing Credentials
 
 For production deployment, use the Google Cloud Secret Manager:
@@ -193,3 +234,35 @@ The deployment is configured for cost-optimization with:
 - Maximum instance cap (max-instances=10)
 
 This setup should cost only a few dollars per month for low to moderate traffic.
+
+### Common Issues and Solutions
+
+1. **Permission denied when deploying to Cloud Run**
+   - Problem: Cloud Build service account lacks necessary permissions
+   - Solution: Grant Cloud Run Admin and Service Account User roles as described above
+
+2. **Unable to access Firestore from Cloud Run**
+   - Problem: Cloud Run service lacks Firestore permissions
+   - Solution: Grant the Firestore User role to the Cloud Run service account
+
+3. **Build fails with "failed to get credentials" error**
+   - Problem: Credentials issue with Container Registry
+   - Solution: Ensure you've configured gcloud authentication correctly
+
+4. **Changes pushed to GitHub don't trigger a build**
+   - Problem: Trigger not properly configured or webhook issue
+   - Solution: Check trigger settings and repository connection status
+
+5. **Environment variables not available in Cloud Run**
+   - Problem: Environment variables need to be set in Cloud Run configuration
+   - Solution: Add environment variables in the Cloud Run console or using gcloud command
+
+### Viewing Your Deployed Application
+
+After successful deployment:
+
+1. Go to Cloud Run in the Google Cloud Console
+2. Click on your service name ("apytracker-backend")
+3. You'll find the URL to your deployed application on the service details page
+4. Your API will be accessible at this URL (e.g., https://apytracker-backend-abc123.run.app/)
+5. Verify it's working by accessing the root endpoint or the documentation at `/docs`
