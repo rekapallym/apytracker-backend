@@ -22,7 +22,6 @@ steps:
     - '--min-instances=0'
     - '--max-instances=10'
 
-
 # Store images in Google Container Registry
 images:
   - 'gcr.io/$PROJECT_ID/apytracker-backend'
