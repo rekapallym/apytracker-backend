@@ -14,7 +14,14 @@
       "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise/start.sh)",
       "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/setup_deployment.sh)",
       "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/add_permissions.sh)",
-      "Bash(chmod u+x /Users/v0r02kq/Developer/sidegig/apytracker-backend/add_permissions.sh)"
+      "Bash(chmod u+x /Users/v0r02kq/Developer/sidegig/apytracker-backend/add_permissions.sh)",
+      "Bash(cd ..)",
+      "Bash(ls -la)",
+      "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/deploy_direct.sh)",
+      "Bash(rm /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise/add_permissions.sh /Users/v0r02kq/Developer/sidegig/apytracker-backend/simplified_permissions.sh /Users/v0r02kq/Developer/sidegig/apytracker-backend/cloudbuild_direct.yaml)",
+      "Bash(ls -la /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise)",
+      "Bash(ls -la /Users/v0r02kq/Developer/sidegig/apytracker-backend/)",
+      "Bash(rm -rf /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise)"
     ],
     "deny": []
   }

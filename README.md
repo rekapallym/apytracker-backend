@@ -89,142 +89,55 @@ POST /calculator
 ```
 ## Deployment to Google Cloud Platform
 
-### Option 1: Manual Deployment
+### Direct Source Deployment (Recommended)
 
-1. Build and push Docker image:
+1. Make sure your service account has the necessary permissions:
    ```sh
-   # Build the Docker image
-   docker build -t gcr.io/YOUR_PROJECT_ID/apytracker-backend .
-   
-   # Push to Google Container Registry
-   docker push gcr.io/YOUR_PROJECT_ID/apytracker-backend
+   gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+     --member='serviceAccount:YOUR_SERVICE_ACCOUNT_EMAIL' \
+     --role='roles/run.admin'
+
+   gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+     --member='serviceAccount:YOUR_SERVICE_ACCOUNT_EMAIL' \
+     --role='roles/iam.serviceAccountUser'
    ```
 
-2. Deploy to Cloud Run:
+2. Deploy directly from source code:
    ```sh
-   gcloud run deploy apytracker-backend \
-     --image gcr.io/YOUR_PROJECT_ID/apytracker-backend \
-     --platform managed \
-     --region us-central1 \
-     --allow-unauthenticated \
-     --memory 512Mi \
-     --min-instances 0 \
-     --max-instances 10
+   bash deploy_direct.sh
    ```
 
-### Option 2: Continuous Deployment with GitHub and Cloud Build (Recommended)
+   This will:
+   - Upload your source code to Cloud Run
+   - Build the container automatically
+   - Deploy and make it publicly accessible
+   - Configure scaling parameters
 
-1. Initialize a Git repository and push to GitHub:
+3. Access your API:
+   - Find the deployed URL in the terminal output or in the GCP Console
+   - API documentation is available at YOUR_URL/docs
+
+### Managing Your Deployment
+
+#### Viewing Logs
+1. In GCP Console:
+   - Go to Cloud Run > apytracker-backend > Logs
+
+2. Via command line:
    ```sh
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin https://github.com/yourusername/apytracker-backend.git
-   git push -u origin main
+   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=apytracker-backend" --limit 50
    ```
 
-2. Set up Cloud Build trigger (detailed steps):
-   
-   a. Go to the Google Cloud Console: https://console.cloud.google.com/
-   
-   b. Navigate to Cloud Build > Triggers
-   
-   c. Click "Connect Repository" (if first time) or "Create Trigger" (if you already have repositories connected)
-   
-   d. Select GitHub as the source and authenticate if prompted
-   
-   e. Select your repository from the list
-   
-   f. Configure the trigger with these settings:
-      - Name: "apytracker-backend-deploy"
-      - Description: "Deploy APYTracker backend to Cloud Run"
-      - Event: "Push to a branch"
-      - Source: Your repository and branch (typically "main" or "master")
-      - Configuration: "Cloud Build configuration file (yaml or json)"
-      - Location: "Repository"
-      - Cloud Build configuration file location: "/cloudbuild.yaml"
-   
-   g. Click "Create"
-
-3. Ensure proper permissions (important!):
-   
-   a. Go to IAM & Admin > IAM in the Google Cloud Console
-   
-   b. Find the Cloud Build service account (it will look like: `[PROJECT-NUMBER]@cloudbuild.gserviceaccount.com`)
-   
-   c. Click the edit (pencil) icon and add these roles:
-      - Cloud Run Admin
-      - Service Account User
-      - Cloud Build Service Account
-   
-   d. Save the changes
-
-4. Trigger your first deployment:
-   
-   a. In the Cloud Build Triggers page, find your new trigger
-   
-   b. Click the "Run Trigger" button to start a manual build
-   
-   c. Monitor the build progress in the Cloud Build history page
-
-5. Future deployments:
-   
-   After setup, whenever you push changes to your GitHub repository, Cloud Build will automatically detect the change and deploy the updated application to Cloud Run.
-
-### Understanding the cloudbuild.yaml File
-
-```yaml
-steps:
-  # Build the container image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/apytracker-backend', '.']
-  
-  # Push the container image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/apytracker-backend']
-  
-  # Deploy container image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-    - 'run'
-    - 'deploy'
-    - 'apytracker-backend'
-    - '--image=gcr.io/$PROJECT_ID/apytracker-backend'
-    - '--region=us-central1'
-    - '--platform=managed'
-    - '--allow-unauthenticated'
-    - '--memory=512Mi'
-    - '--min-instances=0'
-    - '--max-instances=10'
-```
-
-**Important Notes:**
-
-1. **$PROJECT_ID variable**: Cloud Build automatically replaces `$PROJECT_ID` with your actual Google Cloud project ID. You don't need to manually set this value.
-
-2. **Customizing the file**:
-   - Change `us-central1` to your preferred region if needed
-   - Adjust memory and instance settings based on your needs
-   - Add additional build steps if required
-
-3. **Troubleshooting**:
-   - If your build fails, check the Cloud Build logs for detailed error messages
-   - Most common issues are related to permissions or incorrectly formatted YAML
-
-### Managing Credentials
-
-For production deployment, use the Google Cloud Secret Manager:
-
+#### Updating Your Deployment
+Make changes to your code, then run:
 ```sh
-# Create a secret with your service account key
-gcloud secrets create apytracker-service-account \
-  --data-file="path/to/your/gcp-key.json"
-
-# Update your Cloud Run service to use this secret
-gcloud run services update apytracker-backend \
-  --update-secrets=GOOGLE_APPLICATION_CREDENTIALS=/secret/gcp-key.json:apytracker-service-account:latest
+bash deploy_direct.sh
 ```
+
+#### Monitoring Performance
+In GCP Console:
+- Go to Cloud Run > apytracker-backend > Metrics
+- Monitor request count, latency, and resource usage
 
 ### Cost-Optimization
 
@@ -237,25 +150,17 @@ This setup should cost only a few dollars per month for low to moderate traffic.
 
 ### Common Issues and Solutions
 
-1. **Permission denied when deploying to Cloud Run**
-   - Problem: Cloud Build service account lacks necessary permissions
-   - Solution: Grant Cloud Run Admin and Service Account User roles as described above
+1. **Permission denied when deploying**
+   - Problem: Service account lacks necessary permissions
+   - Solution: Grant Cloud Run Admin and Service Account User roles
 
 2. **Unable to access Firestore from Cloud Run**
    - Problem: Cloud Run service lacks Firestore permissions
-   - Solution: Grant the Firestore User role to the Cloud Run service account
+   - Solution: Grant the Firestore User role to the service account
 
-3. **Build fails with "failed to get credentials" error**
-   - Problem: Credentials issue with Container Registry
-   - Solution: Ensure you've configured gcloud authentication correctly
-
-4. **Changes pushed to GitHub don't trigger a build**
-   - Problem: Trigger not properly configured or webhook issue
-   - Solution: Check trigger settings and repository connection status
-
-5. **Environment variables not available in Cloud Run**
+3. **Environment variables not available in Cloud Run**
    - Problem: Environment variables need to be set in Cloud Run configuration
-   - Solution: Add environment variables in the Cloud Run console or using gcloud command
+   - Solution: Add environment variables in the deployment command with --set-env-vars
 
 ### Viewing Your Deployed Application
 
