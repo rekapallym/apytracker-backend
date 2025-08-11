@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uvicorn main:app --reload)",
+      "Bash(uvicorn main:app --reload --port 8001)",
+      "Bash(mkdir -p /Users/v0r02kq/Developer/sidegig/yieldwise)",
+      "Bash(npx create-next-app@latest yieldwise --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\")",
+      "Bash(npx create-next-app@latest yieldwise --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbo)",
+      "Bash(mkdir -p yieldwise)",
+      "Bash(cd yieldwise)",
+      "Bash(npm init -y)",
+      "Bash(npm install react react-dom next typescript @types/react @types/react-dom @types/node)",
+      "Bash(mkdir -p yieldwise/{src/{app,components,lib,styles},public})",
+      "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise/start.sh)"
+    ],
+    "deny": []
+  }
+}
