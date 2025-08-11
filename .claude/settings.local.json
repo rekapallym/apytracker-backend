@@ -11,7 +11,8 @@
       "Bash(npm init -y)",
       "Bash(npm install react react-dom next typescript @types/react @types/react-dom @types/node)",
       "Bash(mkdir -p yieldwise/{src/{app,components,lib,styles},public})",
-      "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise/start.sh)"
+      "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/yieldwise/start.sh)",
+      "Bash(chmod +x /Users/v0r02kq/Developer/sidegig/apytracker-backend/setup_deployment.sh)"
     ],
     "deny": []
   }
