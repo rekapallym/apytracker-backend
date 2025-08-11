@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker/apytracker-backend', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker-backend', '.']
   
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker/apytracker-backend']
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker-backend']
   
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -14,7 +14,7 @@ steps:
     - 'run'
     - 'deploy'
     - 'apytracker-backend'
-    - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/apytracker/apytracker-backend'
+    - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/apytracker-backend'
     - '--region=us-central1'
     - '--platform=managed'
     - '--allow-unauthenticated'
@@ -24,7 +24,7 @@ steps:
 
 # Store images in Google Artifact Registry
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker/apytracker-backend'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/apytracker-backend'
 
 # Set a timeout (optional)
 timeout: '1200s'
